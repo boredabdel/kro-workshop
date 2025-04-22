@@ -1,0 +1,24 @@
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: wordpress.kro.run
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: WordpressCloudSQL
+    spec:
+      projectId: string
+      instanceName: string
+      location: string
+      databaseVersion: string
+
+  resources:
+  - id: cloudsql
+    template:
+      apiVersion: sql.cnrm.cloud.google.com/v1beta1
+      kind: SQLDatabase
+      metadata:
+        name: ${schema.spec.instanceName}
+      spec:
+        databaseVersion: ${schema.spec.databaseVersion}
+        region: ${schema.spec.location}

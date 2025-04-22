@@ -1,0 +1,9 @@
+apiVersion: kro.run/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+spec:
+  name: my-app
+  ingress:
+    enabled: true
+  image: nginx

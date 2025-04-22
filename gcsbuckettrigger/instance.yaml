@@ -1,0 +1,10 @@
+apiVersion: kro.run/v1alpha1
+kind: GCSBucketWithFinalizerTrigger
+metadata:
+  name: gcsevent-test
+  namespace: config-connector
+spec:
+  name: demo-gcs               # used as name or prefix for KCC objects
+  workflowName: gcs-finalizer-workflow   # Replace with your workflow path
+  location: europe-north1       # desired location
+  project: boredabdel-lab     # Replace with your project name
