@@ -7,7 +7,7 @@ These are the instructions for the workshop. Follow them one step at a time
 - Start the Google Cloud Shell (Top right corner of the Google Cloud console).
 - Git clone this repo
 ```
-git clone 
+git clone https://github.com/boredabdel/kro-workshop
 cd kro-workshop
 ```
 # Create GKE cluster
