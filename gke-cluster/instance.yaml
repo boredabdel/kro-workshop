@@ -1,0 +1,9 @@
+apiVersion: kro.run/v1alpha1
+kind: GKECluster
+metadata:
+  name: krodemo
+  namespace: config-connector
+spec:
+  name: krodemo         # Name used for all resources created as part of this RGD
+  location: us-central1 # Region where the GCP resources are created
+  maxnodes: 1           # Max scaling limit for the nodes in the new nodepool

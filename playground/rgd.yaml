@@ -1,0 +1,32 @@
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: playground.kro.run
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: Playground
+    spec:
+      name: string
+      machineType: string | enum="n1-standard-2,n1-standard-4" default="n1-standard-2"
+
+---
+
+# Valid Object
+
+# apiVersion: kro.run/v1alpha1
+# kind: Playground
+# metadata:
+#   name: my-playground
+# spec:
+#   name: my-playgroundn1-standard-2"
+
+# Valid Object
+
+apiVersion: kro.run/v1alpha1
+kind: Playground
+metadata:
+  name: my-playground-invalid
+spec:
+  name: my-playground-invalid
+  machineType: "n1-standard-8"

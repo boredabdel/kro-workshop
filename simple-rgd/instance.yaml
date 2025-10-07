@@ -6,4 +6,4 @@ spec:
   name: my-app
   ingress:
     enabled: true
-  image: nginx
+  image: nginx:stable-perl

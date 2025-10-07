@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
+    cnrm.cloud.google.com/operator-version: 1.136.1
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: configconnector-operator-system
@@ -11,8 +11,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
-    controller-gen.kubebuilder.io/version: v0.14.0
+    cnrm.cloud.google.com/operator-version: 1.136.1
+    controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: configconnectorcontexts.core.cnrm.cloud.google.com
@@ -74,11 +74,38 @@ spec:
                   Specifies the project to use for preconditions, quota and billing.
                   Should only be used when requestProjectPolicy is set to BILLING_PROJECT.
                 type: string
+              experiments:
+                properties:
+                  controllerOverrides:
+                    additionalProperties:
+                      description: ReconcilerType describes the type of reconciler
+                        (controller) being used
+                      type: string
+                    description: |-
+                      ControllerOverrides allows specifying which controller to use for a given
+                      resource kind within this namespace, overriding the system default.
+                      The format for the entries should follow the format as Kind.group :
+                      e.g. BigQueryDataset.bigquery.cnrm.cloud.google.com: direct
+                    type: object
+                type: object
               googleServiceAccount:
                 description: |-
                   The Google Service Account to be used by Config Connector to
                   authenticate with Google Cloud APIs in the associated namespace.
                 type: string
+              managerNamespace:
+                description: |-
+                  ManagerNamespace instructs Config Connector to deploy
+                  controller managers and related resources in the namespace
+                  specified as 'ManagerNamespace' instead of standard 'cnrm-system'
+                  The specified manager namespace may exist before the corresponding
+                  ConfigConnectorContext is created.
+                  If the specified namespace does not exist then it will be created
+                  by Config Connector. The field is immutable.
+                type: string
+                x-kubernetes-validations:
+                - message: ManagerNamespace field is immutable
+                  rule: self == oldSelf
               requestProjectPolicy:
                 description: |-
                   Specifies which project to use for preconditions, quota, and billing for
@@ -127,10 +154,15 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
@@ -144,8 +176,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
-    controller-gen.kubebuilder.io/version: v0.14.0
+    cnrm.cloud.google.com/operator-version: 1.136.1
+    controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: configconnectors.core.cnrm.cloud.google.com
@@ -281,10 +313,15 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         type: object
     served: true
@@ -296,8 +333,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
-    controller-gen.kubebuilder.io/version: v0.14.0
+    cnrm.cloud.google.com/operator-version: 1.136.1
+    controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: controllerreconcilers.customize.core.cnrm.cloud.google.com
@@ -378,14 +415,21 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
         type: object
+        x-kubernetes-validations:
+        - rule: self.metadata.name == 'cnrm-controller-manager'
     served: false
     storage: false
     subresources:
@@ -458,14 +502,21 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
         type: object
+        x-kubernetes-validations:
+        - rule: self.metadata.name == 'cnrm-controller-manager'
     served: true
     storage: true
     subresources:
@@ -475,8 +526,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
-    controller-gen.kubebuilder.io/version: v0.14.0
+    cnrm.cloud.google.com/operator-version: 1.136.1
+    controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: controllerresources.customize.core.cnrm.cloud.google.com
@@ -602,10 +653,15 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
@@ -727,10 +783,15 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
@@ -744,8 +805,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
-    controller-gen.kubebuilder.io/version: v0.14.0
+    cnrm.cloud.google.com/operator-version: 1.136.1
+    controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: mutatingwebhookconfigurationcustomizations.customize.core.cnrm.cloud.google.com
@@ -843,10 +904,15 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
@@ -940,10 +1006,15 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
@@ -957,8 +1028,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
-    controller-gen.kubebuilder.io/version: v0.14.0
+    cnrm.cloud.google.com/operator-version: 1.136.1
+    controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: namespacedcontrollerreconcilers.customize.core.cnrm.cloud.google.com
@@ -1039,14 +1110,21 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
         type: object
+        x-kubernetes-validations:
+        - rule: self.metadata.name == 'cnrm-controller-manager'
     served: false
     storage: false
     subresources:
@@ -1119,14 +1197,21 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
         type: object
+        x-kubernetes-validations:
+        - rule: self.metadata.name == 'cnrm-controller-manager'
     served: true
     storage: true
     subresources:
@@ -1136,8 +1221,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
-    controller-gen.kubebuilder.io/version: v0.14.0
+    cnrm.cloud.google.com/operator-version: 1.136.1
+    controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: namespacedcontrollerresources.customize.core.cnrm.cloud.google.com
@@ -1252,10 +1337,15 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
@@ -1366,10 +1456,15 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
@@ -1383,8 +1478,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
-    controller-gen.kubebuilder.io/version: v0.14.0
+    cnrm.cloud.google.com/operator-version: 1.136.1
+    controller-gen.kubebuilder.io/version: v0.16.5
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: validatingwebhookconfigurationcustomizations.customize.core.cnrm.cloud.google.com
@@ -1483,10 +1578,15 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
@@ -1581,10 +1681,15 @@ spec:
                 type: array
               healthy:
                 type: boolean
+              observedGeneration:
+                default: 0
+                format: int64
+                type: integer
               phase:
                 type: string
             required:
             - healthy
+            - observedGeneration
             type: object
         required:
         - spec
@@ -1598,7 +1703,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
+    cnrm.cloud.google.com/operator-version: 1.136.1
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: configconnector-operator
@@ -1608,9 +1713,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
+    cnrm.cloud.google.com/operator-version: 1.136.1
     cnrm.cloud.google.com/version: 1.125.0
-  creationTimestamp: null
   labels:
     cnrm.cloud.google.com/operator-system: "true"
     cnrm.cloud.google.com/system: "true"
@@ -1619,6 +1723,14 @@ metadata:
 rules:
 - apiGroups:
   - accesscontextmanager.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - aiplatform.cnrm.cloud.google.com
   resources:
   - '*'
   verbs:
@@ -1666,7 +1778,39 @@ rules:
   - list
   - watch
 - apiGroups:
+  - apphub.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - artifactregistry.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - asset.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - backupdr.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch.cnrm.cloud.google.com
   resources:
   - '*'
   verbs:
@@ -1691,6 +1835,14 @@ rules:
   - watch
 - apiGroups:
   - bigqueryanalyticshub.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - bigquerybiglake.cnrm.cloud.google.com
   resources:
   - '*'
   verbs:
@@ -1738,6 +1890,14 @@ rules:
   - list
   - watch
 - apiGroups:
+  - billing.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - billingbudgets.cnrm.cloud.google.com
   resources:
   - '*'
@@ -1771,6 +1931,22 @@ rules:
   - watch
 - apiGroups:
   - cloudbuild.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - clouddeploy.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - clouddms.cnrm.cloud.google.com
   resources:
   - '*'
   verbs:
@@ -1818,6 +1994,14 @@ rules:
   - list
   - watch
 - apiGroups:
+  - cloudquota.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - cloudscheduler.cnrm.cloud.google.com
   resources:
   - '*'
@@ -1827,6 +2011,22 @@ rules:
   - watch
 - apiGroups:
   - cloudtasks.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - colab.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - composer.cnrm.cloud.google.com
   resources:
   - '*'
   verbs:
@@ -1899,6 +2099,14 @@ rules:
   - watch
 - apiGroups:
   - datafusion.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - dataplex.cnrm.cloud.google.com
   resources:
   - '*'
   verbs:
@@ -2130,7 +2338,31 @@ rules:
   - list
   - watch
 - apiGroups:
+  - managedkafka.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - memcache.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - memorystore.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - metastore.cnrm.cloud.google.com
   resources:
   - '*'
   verbs:
@@ -2147,6 +2379,14 @@ rules:
   - watch
 - apiGroups:
   - monitoring.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - netapp.cnrm.cloud.google.com
   resources:
   - '*'
   verbs:
@@ -2346,6 +2586,14 @@ rules:
   - list
   - watch
 - apiGroups:
+  - speech.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - sql.cnrm.cloud.google.com
   resources:
   - '*'
@@ -2394,7 +2642,23 @@ rules:
   - list
   - watch
 - apiGroups:
+  - vmwareengine.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - vpcaccess.cnrm.cloud.google.com
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - workflowexecutions.cnrm.cloud.google.com
   resources:
   - '*'
   verbs:
@@ -2422,7 +2686,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
+    cnrm.cloud.google.com/operator-version: 1.136.1
   creationTimestamp: null
   labels:
     cnrm.cloud.google.com/operator-system: "true"
@@ -2618,7 +2882,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
+    cnrm.cloud.google.com/operator-version: 1.136.1
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: configconnector-operator-cnrm-viewer-role-binding
@@ -2635,7 +2899,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
+    cnrm.cloud.google.com/operator-version: 1.136.1
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: configconnector-operator-rolebinding
@@ -2652,7 +2916,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
+    cnrm.cloud.google.com/operator-version: 1.136.1
   labels:
     cnrm.cloud.google.com/operator-system: "true"
   name: configconnector-operator-service
@@ -2669,7 +2933,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   annotations:
-    cnrm.cloud.google.com/operator-version: 1.129.2
+    cnrm.cloud.google.com/operator-version: 1.136.1
   labels:
     cnrm.cloud.google.com/component: configconnector-operator
     cnrm.cloud.google.com/operator-system: "true"
@@ -2685,17 +2949,20 @@ spec:
   template:
     metadata:
       annotations:
-        cnrm.cloud.google.com/operator-version: 1.129.2
+        cnrm.cloud.google.com/operator-version: 1.136.1
       labels:
         cnrm.cloud.google.com/component: configconnector-operator
         cnrm.cloud.google.com/operator-system: "true"
     spec:
       containers:
       - args:
-        - --local-repo=/configconnector-operator/autopilot-channels
+        - --local-repo=/configconnector-operator/channels
         command:
         - /configconnector-operator/manager
-        image: gcr.io/gke-release/cnrm/operator:1.129.2
+        env:
+        - name: GOMEMLIMIT
+          value: 900MiB
+        image: gcr.io/gke-release/cnrm/operator:1.136.1
         imagePullPolicy: Always
         name: manager
         resources:
