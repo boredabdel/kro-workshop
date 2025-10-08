@@ -171,4 +171,4 @@ kubectl get GKECluster -n config-connector
 For this step you are on your own. You can use the following resources to build an RGD to deploy wordpress on GKE
 
 - https://cloud.google.com/kubernetes-engine/docs/tutorials/persistent-disk
-[- ](https://cloud.google.com/config-connector/docs/reference/overview)
+- (https://cloud.google.com/config-connector/docs/reference/overview)
